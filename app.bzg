@@ -9,6 +9,8 @@ server.get = function (path, data) {
     print("get loc:" + path);
     if (path == "/") {
         server.sendFile("public/index.html");
+    } else if (path == "/style.css") {
+        server.sendFile("public/style.css");
     } else {
         server.sendFile("public/404.html");
     }
@@ -21,21 +23,24 @@ server.get = function (path, data) {
 // Triggered when a client successfully connects
 server.onConnect = function (clientId) {
     print("WebSocket connected! Client ID: " + clientId);
-    // Send a welcome message directly to the connecting client
-    server.send(clientId, "Welcome to WebSocket server!");
+    // Tell the connecting client its ID (used by the browser for signaling)
+    server.send(clientId, "__id__:" + clientId);
 };
 
 // Triggered when a client sends a message
 server.onData = function (message, clientId) {
     print("Received from Client " + clientId + ": " + message);
-    
-    // Broadcast the message to all connected clients
-    server.sendAll("User " + clientId + " says: " + message);
+
+    // Relay the raw message (JSON for chat / WebRTC signaling) to all clients.
+    // Each browser ignores messages that are not addressed to it.
+    server.sendAll(message);
 };
 
 // Triggered when a client disconnects
 server.onDisconnect = function (clientId) {
     print("WebSocket disconnected! Client ID: " + clientId);
+    // Let the remaining clients remove this participant's video tile
+    server.sendAll("__left__:" + clientId);
 };
 
 // Start the server instance
