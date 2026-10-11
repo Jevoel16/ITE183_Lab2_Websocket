@@ -1,0 +1,42 @@
+include("lib/http.bzg");
+
+var server = http(8000);
+
+// ==============================
+// HTTP EVENT HANDLERS
+// ==============================
+server.get = function (path, data) {
+    print("get loc:" + path);
+    if (path == "/") {
+        server.sendFile("public/index.html");
+    } else {
+        server.sendFile("public/404.html");
+    }
+};
+
+// ==============================
+// WEBSOCKET (WS) EVENT HANDLERS
+// ==============================
+
+// Triggered when a client successfully connects
+server.onConnect = function (clientId) {
+    print("WebSocket connected! Client ID: " + clientId);
+    // Send a welcome message directly to the connecting client
+    server.send(clientId, "Welcome to WebSocket server!");
+};
+
+// Triggered when a client sends a message
+server.onData = function (message, clientId) {
+    print("Received from Client " + clientId + ": " + message);
+    
+    // Broadcast the message to all connected clients
+    server.sendAll("User " + clientId + " says: " + message);
+};
+
+// Triggered when a client disconnects
+server.onDisconnect = function (clientId) {
+    print("WebSocket disconnected! Client ID: " + clientId);
+};
+
+// Start the server instance
+server.run();
