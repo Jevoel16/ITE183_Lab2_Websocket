@@ -28,7 +28,6 @@ A real-time, multi-client video call and chat app (in the style of Google Meet),
 - [Project Structure](#project-structure)
 - [Server API Reference](#server-api-reference)
 - [Laboratory Task Checklist](#laboratory-task-checklist)
-- [Troubleshooting](#troubleshooting)
 - [License](#license)
 
 ---
@@ -164,7 +163,7 @@ bonezegei -v
 
 > **Camera access:** browsers only allow the camera and microphone on `localhost` or HTTPS. Other devices on your LAN can open `http://<your-ip>:8000` and use chat, but their camera will be blocked over plain HTTP.
 
-> **Note:** always run the server from the project root so that `lib/`, `public/`, and `libwinpthread-1.dll` are found.
+> **Note:** always run the server from the project root so that `lib/` and `public/` are found.
 
 ---
 
@@ -218,7 +217,6 @@ ITE183_Lab2_Websocket/
 ├── package.json          # Project metadata, dependencies, and the "start" script for `bzg run`
 ├── .gitattributes        # Treats *.bzg as JavaScript for GitHub syntax highlighting
 ├── LICENSE               # MIT License
-├── libwinpthread-1.dll   # MinGW threading runtime required by http.dll
 ├── lib/
 │   ├── http.bzg          # Loads the native http module
 │   ├── http.json         # API description of the http module
@@ -269,26 +267,6 @@ The `http` module (`lib/http.bzg`) exposes:
 
 - [x] `bzg install` installs the required packages
 - [x] `bzg run` starts the server; real-time broadcasting verified across multiple browser windows
-
-## Troubleshooting
-
-### `Failed to install 'http' (code=4)` during `bzg install`
-
-The server is probably still running and has `lib/http/http.dll` locked. Stop the server (press `Ctrl + C` in its terminal), then run `bzg install` again.
-
-### `Failed to load library: lib/http/http.dll`
-
-```
-Failed to load library: lib/http/http.dll
-Undefined variable http
-Error at Line 8: Not a function in simple call context near 'server' (Token IDENT)
-```
-
-`http.dll` was built with MinGW and depends on `libwinpthread-1.dll`. Either keep `libwinpthread-1.dll` in the project root (it's included in this repo) and run from there, or add a folder that contains it to your `PATH` (for example `C:\Program Files\Git\mingw64\bin`).
-
-### Port 8000 already in use
-
-Stop the other process using port 8000, or change the port in `app.bzg` (`http(8000)`). The client builds its WebSocket URL from the page's own host, so no change is needed in `index.html`.
 
 ---
 
